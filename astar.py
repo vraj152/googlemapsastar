@@ -1,9 +1,9 @@
-import helperFile as hp
+import convertJSON as cj
 import heapq as heap
+import time
 
-#%%
 source = (40.5028504, -74.4353862)      #First Node
-destination = (40.5065907, -74.4312433) #Last Node
+destination = (40.527348, -74.4597321) #Last Node
 
 open_list = []
 g_values = {}
@@ -12,20 +12,19 @@ f_values = {}
 closed_list = []
 path = []
 
-sourceID = hp.getOSMId(source[0], source[1])
-destID = hp.getOSMId(destination[0], destination[1])
+sourceID = cj.getOSMId(source[0], source[1])
+destID = cj.getOSMId(destination[0], destination[1])
 
 g_values[sourceID] = 0
-h_source = hp.calculateHeuristic(source, destination)
+h_source = cj.calculateHeuristic(source, destination)
 
 open_list.append((h_source,sourceID))
 
-#%%
+s = time.time()
 while(len(open_list)>0):
     curr_state = open_list[0][1]
     
     print(curr_state)
-    print(hp.getLatLon(curr_state))
     
     heap.heappop(open_list)
     closed_list.append(curr_state)
@@ -34,11 +33,11 @@ while(len(open_list)>0):
         print("We have reached to the goal")
         break 
     
-    nbrs = hp.getNeighbours(curr_state, destination)
+    nbrs = cj.getNeighbours(curr_state, destination)
     values = nbrs[curr_state]
     for eachNeighbour in values:
         
-        neighbourId, neighbourHeuristic, neighbourCost = hp.getNeighbourInfo(eachNeighbour)
+        neighbourId, neighbourHeuristic, neighbourCost = cj.getNeighbourInfo(eachNeighbour)
         current_inherited_cost = g_values[curr_state] + neighbourCost
 
         #Check if neighbour is in closed list, skip it
@@ -52,3 +51,5 @@ while(len(open_list)>0):
         
     open_list = list(set(open_list))
     heap.heapify(open_list)
+   
+print(time.time()-s)
