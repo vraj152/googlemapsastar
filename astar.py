@@ -2,14 +2,14 @@ import convertJSON as cj
 import heapq as heap
 import time
 
-source = (40.5028504, -74.4353862)      #First Node
-destination = (40.527348, -74.4597321) #Last Node
+source = (40.5217298, -74.4707964)      #First Node
+destination = (40.5065907, -74.4312433) #Last Node
 
 open_list = []
 g_values = {}
 f_values = {}
 
-closed_list = []
+closed_list = {}
 path = []
 
 sourceID = cj.getOSMId(source[0], source[1])
@@ -27,7 +27,7 @@ while(len(open_list)>0):
     print(curr_state)
     
     heap.heappop(open_list)
-    closed_list.append(curr_state)
+    closed_list[curr_state] = ""
     
     if(curr_state==destID):
         print("We have reached to the goal")
