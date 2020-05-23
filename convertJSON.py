@@ -1,9 +1,14 @@
 import xmltodict
 from haversine import haversine
+import time
+import numpy as np
+from sklearn.neighbors import KDTree
 
+s = time.time()
 doc = {}
 with open('data/map.graphml') as fd:
     doc = xmltodict.parse(fd.read())
+print(time.time()-s)
 
 def getLatLon(OSMId):
     lat, lon = 0, 0
@@ -61,5 +66,25 @@ def getNeighbourInfo(neighbourDict):
         neighbourId = key
         neighbourHeuristic = float(value[2])
         neighbourCost = float(value[1])/1000
+        neighbourLatLon = value[0]
         
-    return neighbourId, neighbourHeuristic, neighbourCost
+    return neighbourId, neighbourHeuristic, neighbourCost, neighbourLatLon
+
+#Argument should be tuple
+
+def getKNN(pointLocation):
+    nodes = doc["graphml"]["graph"]["node"]
+    locations = []
+    for eachNode in range(len(nodes)):
+        locations.append((nodes[eachNode]["data"][0]["#text"],nodes[eachNode]["data"][1]["#text"]))
+
+    locations_arr = np.asarray(locations, dtype=np.float32)
+    point = np.asarray(pointLocation, dtype=np.float32)
+
+    tree = KDTree(locations_arr, leaf_size=2)
+    dist, ind = tree.query(point.reshape(1,-1), k=3) 
+    
+    nearestNeighbourLoc = (float(locations[ind[0][0]][0]), float(locations[ind[0][0]][1]))
+    
+    return nearestNeighbourLoc
+    

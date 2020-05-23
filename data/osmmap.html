@@ -1,52 +1,109 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title></title>
-        <script src="http://openlayers.org/api/OpenLayers.js"></script>
-        <script type="text/javascript">
-            var lat=34.070;
-            var lon=-118.73;
-            var zoom=15;
-            var map;
- 
-            function init(){
-                map = new OpenLayers.Map ("map", {
-                controls:[
-                    new OpenLayers.Control.Navigation(),
-                    new OpenLayers.Control.PanZoomBar(),
-                    new OpenLayers.Control.LayerSwitcher(),
-                    new OpenLayers.Control.Attribution()],
-                    maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
-                    maxResolution: 156543.0399,
-                    numZoomLevels: 19,
-                    units: 'm',
-                    projection: new OpenLayers.Projection("EPSG:900913"),
-                    displayProjection: new OpenLayers.Projection("EPSG:4326")
-                } );
- 
-                
-                map.addLayer(new OpenLayers.Layer.OSM());
- 
-                var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
- 
-                map.setCenter (lonLat, zoom);
-
-                //Initialise the vector layer using OpenLayers.Format.OSM
-                var layer = new OpenLayers.Layer.Vector("Polygon", {
-                    strategies: [new OpenLayers.Strategy.Fixed()],
-                    protocol: new OpenLayers.Protocol.HTTP({
-                        url: "myosmfile.osm",   //<-- relative or absolute URL to your .osm file
-                        format: new OpenLayers.Format.OSM()
-                    }),
-                    projection: new OpenLayers.Projection("EPSG:4326")
-                });
- 
-                map.addLayers([layer]);
- 
-            }
-        </script>
-    </head>
-    <body onload="init()">
-        <div id="map" class="smallmap"></div>
-        </div>
-    </body>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+	  var SERVER_URL="http://localhost:5000"
+	  var REST_API=SERVER_URL + "/calculate?pntdata="
+	  var marker;
+	  var map;
+	  
+      function initMap() {
+		var bounds = new google.maps.LatLngBounds();
+		bounds.extend(new google.maps.LatLng(40.4961, -74.5015));
+		bounds.extend(new google.maps.LatLng(40.5333, -74.4143));
+		map = new google.maps.Map(document.getElementById('map'), {
+		  center: {lat: 40.515672, lng: -74.426236}, 
+          zoom: 14
+        });
+		map.fitBounds(bounds);
+		var infoWindow;
+		var count = 0;
+		var source = "";
+		var dest = "";
+		
+		map.addListener('click', function(mapsMouseEvent) {
+		if(count==2){
+			REST_CALL = REST_API + source + "," + dest;
+			console.log(REST_CALL);
+			var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", REST_CALL, true);
+            xhttp.onload = function (e)
+            {
+				if (xhttp.readyState === 4)
+				{
+					if (xhttp.status === 200)
+					{
+						console.log("Recognized: ", xhttp.responseText);
+					}
+					else
+					{
+						console.error("Server error: ", xhttp.statusText);
+					}
+				}
+			};
+			xhttp.onerror = function (e)
+			{
+				console.error("Error connecting to: ", SERVER_URL);
+			};
+			xhttp.send();
+		}else{
+			count = count + 1;
+			temp = mapsMouseEvent.latLng.toString().replace(/[{()}]/g, '');
+			var differentPoints = temp.split(',');
+			
+			if(count==1){
+				source = source + differentPoints[0] + "," + differentPoints[1].replace(/\s/g, "");
+				marker = new google.maps.Marker({
+					map: map,
+					title: 'Source',
+					animation: google.maps.Animation.DROP,
+					position: mapsMouseEvent.latLng
+				});
+				marker.addListener('click', toggleBounce);
+				
+				marker.setMap(map);
+			}else{
+				dest = dest + differentPoints[0] + "," + differentPoints[1].replace(/\s/g, "");
+				marker = new google.maps.Marker({
+					map: map,
+					title: 'Destination',
+					animation: google.maps.Animation.DROP,
+					position: mapsMouseEvent.latLng
+				});
+				marker.addListener('click', toggleBounce);
+				marker.setMap(map);
+			}
+		}
+		});
+	  }
+	  function toggleBounce()
+	  {
+		if (marker.getAnimation() !== null) 
+		{
+			marker.setAnimation(null);
+		}else 
+		{
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+		}
+	  }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"
+    async defer></script>
+  </body>
 </html>

@@ -16,12 +16,16 @@ for eachNode in range(len(nodes)):
 
 locations_arr = np.asarray(locations, dtype=np.float32)
 
+#%%
 s= time.time()
-point = (40.521893, -74.471397)
+point = (40.48548889074625,-74.44171724545885)
 point = np.asarray(point, dtype=np.float32)
+
 tree = KDTree(locations_arr, leaf_size=2)
 dist, ind = tree.query(point.reshape(1,-1), k=3) 
+
 print(dist)
-print(locations[ind[0][0]])
+ans = (float(locations[ind[0][0]][0]), float(locations[ind[0][0]][1]))
+print(ans)
 #print(locations[ind])
 print(time.time()-s)

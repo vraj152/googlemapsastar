@@ -2,54 +2,53 @@ import convertJSON as cj
 import heapq as heap
 import time
 
-source = (40.5217298, -74.4707964)      #First Node
-destination = (40.5065907, -74.4312433) #Last Node
-
-open_list = []
-g_values = {}
-f_values = {}
-
-closed_list = {}
-path = []
-
-sourceID = cj.getOSMId(source[0], source[1])
-destID = cj.getOSMId(destination[0], destination[1])
-
-g_values[sourceID] = 0
-h_source = cj.calculateHeuristic(source, destination)
-
-open_list.append((h_source,sourceID))
-
-s = time.time()
-while(len(open_list)>0):
-    curr_state = open_list[0][1]
+def aStar(source, destination):
+    open_list = []
+    g_values = {}
     
-    print(curr_state)
+    path = {}
+    closed_list = {}
     
-    heap.heappop(open_list)
-    closed_list[curr_state] = ""
+    sourceID = cj.getOSMId(source[0], source[1])
+    destID = cj.getOSMId(destination[0], destination[1])
     
-    if(curr_state==destID):
-        print("We have reached to the goal")
-        break 
+    g_values[sourceID] = 0
+    h_source = cj.calculateHeuristic(source, destination)
     
-    nbrs = cj.getNeighbours(curr_state, destination)
-    values = nbrs[curr_state]
-    for eachNeighbour in values:
+    open_list.append((h_source,sourceID))
+    
+    s = time.time()
+    while(len(open_list)>0):
+        curr_state = open_list[0][1]
         
-        neighbourId, neighbourHeuristic, neighbourCost = cj.getNeighbourInfo(eachNeighbour)
-        current_inherited_cost = g_values[curr_state] + neighbourCost
-
-        #Check if neighbour is in closed list, skip it
-        if(neighbourId in closed_list):
-            continue
-        else:
-            g_values[neighbourId] = current_inherited_cost
-            neighbourFvalue = neighbourHeuristic + current_inherited_cost
+        #print(curr_state)
+        heap.heappop(open_list)
+        closed_list[curr_state] = ""
+        
+        if(curr_state==destID):
+            print("We have reached to the goal")
+            break 
+        
+        nbrs = cj.getNeighbours(curr_state, destination)
+        values = nbrs[curr_state]
+        for eachNeighbour in values:
+            neighbourId, neighbourHeuristic, neighbourCost, neighbourLatLon = cj.getNeighbourInfo(eachNeighbour)
+            current_inherited_cost = g_values[curr_state] + neighbourCost
+    
+            if(neighbourId in closed_list):
+                continue
+            else:
+                g_values[neighbourId] = current_inherited_cost
+                neighbourFvalue = neighbourHeuristic + current_inherited_cost
+                
+                open_list.append((neighbourFvalue, neighbourId))
             
-            open_list.append((neighbourFvalue, neighbourId))
-        
-    open_list = list(set(open_list))
-    heap.heapify(open_list)
-   
-print(time.time()-s)
+            path[str(neighbourLatLon)] = {"parent":str(cj.getLatLon(curr_state)), "cost":current_inherited_cost}
+            
+        open_list = list(set(open_list))
+        heap.heapify(open_list)
+    
+    print(len(open_list))
+    print(time.time()-s)
+    
+    return path
