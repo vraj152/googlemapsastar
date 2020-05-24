@@ -18,7 +18,7 @@ locations_arr = np.asarray(locations, dtype=np.float32)
 
 #%%
 s= time.time()
-point = (40.48548889074625,-74.44171724545885)
+point = (40.48834484237183,-74.4464808486693)
 point = np.asarray(point, dtype=np.float32)
 
 tree = KDTree(locations_arr, leaf_size=2)

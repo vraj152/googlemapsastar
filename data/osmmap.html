@@ -49,7 +49,17 @@
 				{
 					if (xhttp.status === 200)
 					{
-						console.log("Recognized: ", xhttp.responseText);
+						var lineCoordinates = JSON.parse(xhttp.responseText);
+						for(var i=0;i<lineCoordinates.length;i++){
+							marker = new google.maps.Marker({
+								map: map,
+								title: 'path',
+								animation: google.maps.Animation.DROP,
+								position: lineCoordinates[i]
+							});
+							marker.setMap(map);
+						}
+						console.log(xhttp.responseText);
 					}
 					else
 					{

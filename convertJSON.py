@@ -88,3 +88,21 @@ def getKNN(pointLocation):
     
     return nearestNeighbourLoc
     
+def getResponsePathDict(paths, source, destination):
+    finalPath = []
+    child = destination
+    parent = ()
+    cost = 0
+    while(parent!=source):
+        tempDict = {}
+        cost = cost + float(paths[str(child)]["cost"])
+        parent = paths[str(child)]["parent"]
+        parent = tuple(float(x) for x in parent.strip('()').split(','))
+        
+        tempDict["lat"] = parent[0]
+        tempDict["lng"] = parent[1]
+        
+        finalPath.append(tempDict)
+        child = parent
+        
+    return finalPath, cost

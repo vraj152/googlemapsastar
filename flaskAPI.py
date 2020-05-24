@@ -18,13 +18,10 @@ def home():
     mappedDestLoc = cj.getKNN(inputDestLoc)
     
     path = algo.aStar(mappedSourceLoc, mappedDestLoc)
-    getFinalPath(mappedSourceLoc, mappedDestLoc, path)
+    finalPath, cost = cj.getResponsePathDict(path, mappedSourceLoc, mappedDestLoc)
     
-    jsonObject = json.dumps(path)
-    return (jsonObject)
-
-def getFinalPath(mappedSourceLoc, mappedDestLoc, path):
-    return ""
+    print("Cost of the path(km): "+str(cost))
+    return json.dumps(finalPath)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

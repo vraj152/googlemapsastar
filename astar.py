@@ -43,12 +43,10 @@ def aStar(source, destination):
                 
                 open_list.append((neighbourFvalue, neighbourId))
             
-            path[str(neighbourLatLon)] = {"parent":str(cj.getLatLon(curr_state)), "cost":current_inherited_cost}
+            path[str(neighbourLatLon)] = {"parent":str(cj.getLatLon(curr_state)), "cost":neighbourCost}
             
         open_list = list(set(open_list))
         heap.heapify(open_list)
     
-    print(len(open_list))
-    print(time.time()-s)
-    
+    print("Time taken to find path(in second): "+str(time.time()-s))
     return path
