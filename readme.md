@@ -1,7 +1,7 @@
 # Project: A* algorithm on google maps to find shortest path (googlemapsastar)
 __Data:__
 * Data has been extracted from [OSM](https://www.openstreetmap.org/).<br> 
-* I have extracted data containing ~27k nodes and ~63k edges) <br>
+* It contains ~27k nodes and ~63k edges <br>
 * _Bounded by :- min: (40.4961000, -74.5015000); max: (40.5333000, -74.4143000)_ <br>
 * More on data:
   * Data provided by OSM is in __.osm__ format, which is nothing but the XML file. 
